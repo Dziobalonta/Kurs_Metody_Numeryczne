@@ -1,0 +1,95 @@
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[polish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{subcaption} 
+\usepackage[margin=2cm]{geometry}
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=C++,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\title{Raport Zadanie NUM2}
+\date{28.10.2023}
+\author{Tomasz Dziób}
+
+\begin{document}
+  \maketitle
+  \newpage
+  \section{Wstęp}
+  Poniższy raport dotyczy zadania numerycznego NUM2 z listy 1.
+  Załączony program o nazwie \textit{num2.cpp} został napisany w języku \textit{C++}, do wykonania
+  matematycznych obliczeń został użyty \textit{GSL}. Przed skompilowaniem programu należy
+  zainstalować powyższą bibliotekę.
+    \subsection{Jak uruchomić program?}
+    Razem z załączonymi plikami znajdziemy \textit{Makefile} który służy do
+    uruchomienia programu komendą: \textit{make run}.
+  \section{Spodziewany wynik}
+  Spodziewany wynik rozwiązania równań macierzowych zależy od wartości macierzy A oraz wektora 
+  wyrazów wolnych b, a zaburzenie $\Delta$b o małej normie euklidesowej nie powinno znacząco 
+  wpływać na rozwiązania, jeśli obliczenia numeryczne są wykonywane w sposób dokładny.
+
+  \section{Użyta metoda}
+  Rozwiązanie sprowadza się do obliczenia wartości \textit{y} z wzoru \textit{A $\cdot$ y = b} używając
+  wybranych funkcji z biblioteki \textit{GSL}. Wyniki uzyskujemy poprzez zaburzenie wartości 
+  wektora b dodając do niego losowe liczby rzędu $10^{-6}$. 
+
+  \section{Uzyskany wynik}
+  \begin{lstlisting}
+                           === DLA MACIERZY A1 ===
+    A1 * y = b
+    
+    y = [ 0.225084577 -0.006020997 1.841831983 -5.153442774 -0.217622915 ]
+    
+    A1 * y = (b + Delta_b)
+    
+    y = [ 837.799675877 -3013.301457583 -390.534586414 797.387978471 996.129372383 ]
+    
+                            === DLA MACIERZY A2 ===
+    A1 * y = b
+    
+    y = [ 0.577471720 -1.273784582 1.676750084 -4.815794905 0.201563474 ]
+    
+    A2 * y = (b + Delta_b)
+    
+    y = [ 0.577471560 -1.273785006 1.676749955 -4.815794644 0.201563572 ]
+    \end{lstlisting}
+    Spoglądając na wyniki uzyskane po wykonaniu zaburzenia jesteśmy wstanie odrazu zauważyć
+    różnicę. Pomimo założeń mówiących, że tak małe wartości nie powinny mieć znaczącego wpływu
+    na wynik, okazujemy się być w błedzie. Dla przykładu $A_1$ uzyskujemy wartości liczone w setkach
+    a nawet tysiącach, dla konstrastu w drugim nawet nie przekaczają liczby dziesiątek.
+
+    Rozwiązanie $A_1$ z zaburzonym wektorem wyrazów wolnych jest nierealistycznie duże, 
+    co sugeruje, że nawet niewielkie zaburzenie $\Delta$b może znacząco wpłynąć na rozwiązanie. 
+    Wartości w tym przypadku są znacznie większe niż te w oryginalnym rozwiązaniu.
+    Rozwiązanie $A_2$ z zaburzonym wektorem wyrazów wolnych jest tylko nieznacznie zmienione w 
+    porównaniu do oryginalnego rozwiązania. To sugeruje, że macierz $A_2$ jest bardziej 
+    stabilna względem zaburzeń $\Delta$b w porównaniu do macierzy $A_1$.
+  
+    Ogólnie rzecz biorąc, wyniki sugerują, że stabilność numeryczna rozwiązań zależy od 
+    właściwości macierzy. Macierz $A_2$ wydaje się być bardziej stabilna wobec zaburzeń niż macierz $A_1$. 
+    Niemniej jednak, wartości zaburzenia $\Delta$b są na tyle małe (o normie euklidesowej rzędu $10^{-6}$), 
+    że na pierwszy rzut oka nie wyglądają jabky miały znaczący wpływ na rozwiązania dla obu macierzy. 
+
+\end{document}
