@@ -1,0 +1,192 @@
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[polish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{subcaption} 
+\usepackage[margin=2cm]{geometry}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{tcolorbox}
+\usepackage{systeme}
+\usepackage{indentfirst}
+\usepackage{dsfont}
+
+\definecolor{red}{RGB}{245, 63, 60}
+\definecolor{blue}{RGB}{59, 69, 245}
+\definecolor{green}{RGB}{59, 245, 117}
+\definecolor{yellow}{RGB}{245, 207, 59}
+
+\title{Raport Zadanie NUM6}
+\date{17.12.2023}
+\author{Tomasz Dziób}
+
+\begin{document}
+  \maketitle
+  \newpage
+  \section{Wstęp techniczny}
+  Poniższy raport dotyczy zadania numerycznego NUM6 z listy 5. Załączone programy o nazwie \textit{num6\_a.cpp} i \textit{num6\_b.cpp} zostały napisane w języku \textit{C++}, oraz korzystają z bibiotek \textit{GNU Plot} oraz \textit{GSL}. Do sprawdzenia obliczeń zostały użyte pliki \textit{check\_a.cpp} i \textit{check\_b.cpp} korzystające z biblioteki \textit{GSL}. Przed skompilowaniem programu należy zainstalować powyższe biblioteki.
+
+    \subsection{Jak uruchomić program?}
+    Razem z załączonymi plikami znajdziemy \textit{Makefile} który służy do uruchomienia programów.
+    \begin{itemize}
+      \item \textit{make runA} uruchamia program dotyczący podpunktu a wraz ze sprawdzeniem 
+      \item \textit{make runB} uruchamia program dotyczący podpunktu b wraz ze sprawdzeniem 
+  \end{itemize}
+
+  \section{Nakreślenie problemu}
+  \begin{enumerate}
+    \item[\bf{a)}] Algorytm QR opiera się na rozkładzie QR macierzy oraz służy do znajdowania wartości własnych oraz wektorów własnych. Rozkład QR macierzy polega na sprowadzeniu macierzy A do postaci iloczynu dwóch macierzy gdzie \textbf{Q} jest \textcolor{red}{macierzą ortogonalną} a \textbf{R} jest \textcolor{blue}{macierzą trójkątną górną}.
+    \begin{center}
+      $\begin{bmatrix}
+        \bullet & \bullet & \bullet & \bullet & \bullet \\
+        \bullet & \bullet & \bullet & \bullet & \bullet \\
+        \bullet & \ddots & \ddots & \ddots & \bullet \\
+        \bullet & \bullet & \bullet & \bullet & \bullet \\
+        \bullet & \bullet & \bullet & \bullet & \bullet \\
+      \end{bmatrix}$
+    $=$
+    $\begin{bmatrix}
+      \textcolor{red}{\bullet} & \textcolor{red}{\bullet} & \textcolor{red}{\bullet} & \textcolor{red}{\bullet} & \textcolor{red}{\bullet} \\
+      \textcolor{red}{\bullet} & \textcolor{red}{\bullet} & \textcolor{red}{\bullet} & \textcolor{red}{\bullet} & \textcolor{red}{\bullet} \\
+      \textcolor{red}{\bullet} & \ddots & \ddots & \ddots & \textcolor{red}{\bullet} \\
+      \textcolor{red}{\bullet} & \textcolor{red}{\bullet} & \textcolor{red}{\bullet} & \textcolor{red}{\bullet} & \textcolor{red}{\bullet} \\
+      \textcolor{red}{\bullet} & \textcolor{red}{\bullet} & \textcolor{red}{\bullet} & \textcolor{red}{\bullet} & \textcolor{red}{\bullet} \\
+    \end{bmatrix}$
+    $\begin{bmatrix}
+      \textcolor{blue}{\bullet} & \textcolor{blue}{\bullet} & \textcolor{blue}{\bullet} & \textcolor{blue}{\bullet} & \textcolor{blue}{\bullet} \\
+      0 & \textcolor{blue}{\bullet} & \textcolor{blue}{\bullet} & \textcolor{blue}{\bullet} & \textcolor{blue}{\bullet} \\
+      0 & \ddots & \ddots & \ddots & \textcolor{blue}{\bullet} \\
+      0 & 0 & 0 & \textcolor{blue}{\bullet} & \textcolor{blue}{\bullet} \\
+      0 & 0 & 0 & 0 & \textcolor{blue}{\bullet} \\
+    \end{bmatrix}$
+    \begin{flushleft}
+      \begin{flalign*}
+        Q^TQ &= \mathds{1} &
+      \end{flalign*}
+      $Q^{-1}=Q^T$ \\
+      \raisebox{-0.3cm}{$det Q = \pm 1$}
+      \end{flushleft}
+    \end{center}
+
+    Po wykonaniu algorytmu otrzymujemy macierz z wartościami własnymi na diagonali. Rozwiązując równanie $(A-\lambda\mathds{1})\vec{x}$ = 0 dla każdej z wartości, otrzymujemy wektory własne.
+
+    \item[\bf{b)}] W tym przypadku została użyta metoda potęgowa która służy do odnalezienia największej wartości własnej wraz z odpowiadającym jej wektorem. Jej zaletą jest to, że pozwala wyliczyć to bez marnowania mocy obliczeniowej na znalezienie pozostałych wartości oraz wektorów.
+\end{enumerate}
+
+  Plusem obu metod jest iteracyjna natura która pozwala na wyliczenie poszukiwanych wartości do zadanej dokładności co wiąże się z adekwatnie mniejszym czasem wykonania programu.
+    
+  \section{Użyta metoda}
+  \begin{enumerate}
+    \item[\bf{a)}] \textit{Algorytm QR} polega dokonaniu rozkładu macierzy $A_1$ na kolejno $Q_1$ oraz $R_1$. Następnie w kolejnych iteracjach macierz $A_2$ konstruujemy z przemnożenia $R_1$ przez $Q_1$. Kontynuujemy to do uzyskania satysfakcjonującej dokładności wartości własnych, które znajdują się na diagonali  $A_n$.
+    \begin{center}
+      \begin{alignat*}{2}
+        A_1 &= Q_1R_1 & \\
+        A_2 = R_1Q_1 & = Q_2R_2& \\
+        A_3 = R_2Q_2 & = Q_3R_3& \\
+        \vdots \\
+        A_{n-1} = R_{n-2}Q_{n-2} & = Q_{n-1}R_{n-1}& \\
+        A_{n} &= Q_{n-1}R_{n-1}& \\
+    \end{alignat*}
+    \end{center}
+    \item[\bf{b)}] W \textit{metodzie potęgowej}, dla macierzy A, szukamy jej największej wartości własnej oraz odpowiadającego jej wektora. aby to uzyskać postępujemy tak:
+    \begin{center}
+      $A\vec{v_k} = \vec{x_k}$ \\
+      $\vec{v}_{k+1} = \frac{\vec{x}_k}{||\vec{x}_k||}$
+    \end{center}
+
+    \begin{enumerate}
+      \item[\bf{1.}] Wybieramy losowy, niezerowy(!) wektor \textit{$\vec{v}$} oraz obliczamy $A\vec{v} = \vec{x}$.
+      \begin{center}
+        $\begin{bmatrix}
+          a_{11} & a_{12} & a_{13}  \\
+          a_{21} & a_{22} & a_{23}  \\
+          a_{31} & a_{32} & a_{33} \\
+        \end{bmatrix}$
+        $\begin{bmatrix}
+          1 \\
+          2 \\
+          3 \\
+        \end{bmatrix}$
+        $=$
+        $\begin{bmatrix}
+          x_1 \\
+          x_2 \\
+          x_3 \\
+        \end{bmatrix}$
+      \end{center}
+      Jest to nasze przybliżenie wartości własnej w danej iteracji.
+      \item[\bf{2.}] Normalizujemy wektor $\vec{x}$ przez jego normę w celu uniknięcia mnożenia dużych liczb oraz wyjścia z zakresu używanego typu.
+      \begin{center}
+        \large $\begin{bmatrix}
+          \frac{x_1}{||\vec{x}||} \\
+          \frac{x_2}{||\vec{x}||} \\
+          \frac{x_3}{||\vec{x}||} \\
+        \end{bmatrix}$
+      \end{center}
+      \item[\bf{3.}] Za nasz wektor $\vec{v}$ przyjmujemy teraz znormalizowany wektor $\vec{x}$ i powtarzamy cały algorytm do uzyskania zadowalającego przybliżenia.
+    \end{enumerate}
+    Naszą największą wartością własną jest norma wektora $||\vec{x}||$, a wektor własny jej odpowiadający to $\vec{v}$.
+  \end{enumerate}
+
+  \section{Uzyskany wynik}
+  \begin{enumerate}
+    \item[\bf{a)}] Wynik wykonania komendy \textit{make runA}:
+    \begin{center}
+      \begin{tcolorbox}
+        num6\_a.cpp\\
+        Wartosci wlasne:\\
+        1.05304 4.81581 5.90016 7.23099\\
+
+        check\_a.cpp\\
+        Wartosci wlasne:\\
+        1.05304 4.81581 5.90016 7.23099
+      \end{tcolorbox}
+    \end{center}
+
+    \item[\bf{b)}] Wynik wykonania komendy \textit{make runB}:
+    \begin{center}
+      \begin{tcolorbox}
+        num6\_b.cpp\\
+        Najwieksza wartosc wlasna:\\
+        10.016\\
+        Odpowiadajacy wektor wlasny:\\
+        0.558297 0.776208 0.286788 0.0596481\\ 
+
+        check\_b.cpp\\
+        Wartosci wlasne:\\ 
+        1.44264 -3.81179 7.35317 10.016\\
+        Wektory wlasne:\\ 
+        -0.406417\qquad-0.613835\qquad0.382539\qquad0.558297\\ 
+        -0.00966313\qquad0.418661\qquad-0.471307\qquad0.776208\\ 
+        0.873226\qquad-0.0764527\qquad0.386502\qquad0.286788\\ 
+        -0.268715\qquad0.664894\qquad0.69437\qquad0.0596481\\
+      \end{tcolorbox}
+    \end{center}
+  \end{enumerate}
+
+  Przedstawiając ten wynik na wykresie wyglądałoby to tak jak poniżej. Wartośc błędu bezwględnego wyświetlana jest w obu przypadkach w skali logarytmicznej. Dla podpunktu a) jest to moduł różnicy pomiędzy pierwszą wartością własną uzyskaną w tej iteracji, a tej z poprzedniej. Dla podpunktu b) jest to norma wektora $\vec{v}_{k-1} - \vec{v}_k$. 
+    \begin{figure}[!ht]
+      \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{wyniki_a.eps}
+        \caption{Wykres dla podpunktu a)\\dokładność = $10^{-6}$}
+      \end{minipage}
+      \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{wyniki_b.eps}
+        \caption{Wykres dla podpunktu b)\\dokładność = $10^{-8}$}
+      \end{minipage}
+    \end{figure}
+
+
+  \section{Podsumowanie}
+  \textit{Algorytm QR} oraz \textit{Metoda Potęgowa} przydają się najbardziej gdy nie potrzebujemy pełnej dokładności rozwiązania. Jeśli wystarcza nam przybliżone rozwiązanie, metody te mogą być bardziej efektywne, ponieważ mogą zatrzymać się po osiągnięciu pewnego akceptowalnego poziomu dokładności, co może przyspieszyć obliczenia. Jednak obywa rozwiązania mają swoje plusy i minusy.
+
+  Dodatkową zaletą algorytmu QR jest to, że zachowuje symetrię, postać trójdiagonalną
+  symetryczną i postać Hessenberga macierzy.
+
+  Natomiast jeżeli przy pomocy metody potęgowej trzeba znależć więcej niż kilka wartości wektorów własnych, metoda, z uwagi na konieczność reortogonalizacji, staje się bardzo kosztowna. Jeżeli w widmie macierzy pojawiają się wartości własne bardzo zbliżone co do modułu — na przykład 2 oraz 1.99999999, ale też 1 oraz 0.99999999 — zbieżność jest bardzo wolna, a nawet można spodziewać się stagnacji. Nie działa też ona dla macierzy niesymetrycznych.
+\end{document}
