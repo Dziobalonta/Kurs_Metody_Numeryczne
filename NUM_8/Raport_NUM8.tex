@@ -1,0 +1,141 @@
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[polish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{subcaption} 
+\usepackage[margin=2cm]{geometry}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{tcolorbox}
+\usepackage{systeme}
+\usepackage{indentfirst}
+\usepackage{dsfont}
+
+\definecolor{red}{RGB}{245, 63, 60}
+\definecolor{blue}{RGB}{59, 69, 245}
+\definecolor{green}{RGB}{59, 245, 117}
+\definecolor{yellow}{RGB}{245, 207, 59}
+
+\title{Raport Zadanie NUM8}
+\date{31.12.2023}
+\author{Tomasz Dziób}
+
+\begin{document}
+  \maketitle
+  \newpage
+  \section{Wstęp techniczny}
+  Poniższy raport dotyczy zadania numerycznego NUM8 z listy 7. Załączone programy o nazwie \textit{num8\_a.cpp} i \textit{num8\_b.cpp} zostały napisane w języku \textit{C++}, oraz korzystają z bibiotek \textit{GNU Plot} oraz \textit{GSL}. Przed skompilowaniem programu należy zainstalować powyższe biblioteki.
+
+    \subsection{Jak uruchomić program?}
+    Razem z załączonymi plikami znajdziemy \textit{Makefile} który służy do uruchomienia programów.
+    \begin{itemize}
+      \item \textit{make runA} uruchamia program dotyczący podpunktu a
+      \item \textit{make runB} uruchamia program dotyczący podpunktu b
+    \end{itemize}
+
+  \section{Nakreślenie problemu}
+
+  Aproksymacja jest to proces budowania przybliżonych rozwiązań używany w sytuacjach gdy nie da się go przedstawić dokładnie w postaci analitycznej. Termin aproksymacja występuje w dwóch znaczeniach:
+  \begin{enumerate}
+    \item[\bf{a)}] Aproksymacja punktowa
+    Mając N punktów staramy się znaleźć funkcję która będzie przebiegać możliwie ``najbliżej'' tych punktów. Znamy ``kształt'' szukanej funkcji (np. stopień, kombinacja funkcji trygonometrycznych), ale jej parametry są nieznane.
+    \begin{center}
+      $\textcolor{red}{a}x^3+\textcolor{blue}{b}x^2+\textcolor{green}{c}x+\textcolor{yellow}{d}$
+    \end{center}
+    \item[\bf{b)}] Aproksymacja ciągła
+    Znając ustaloną funkcję \textit{g(x)} której analityczny sposób obliczania jest trudny staramy się skonstruować inną funkcję która będzie bliska funkcji wyjściowej, a rownocześnie prostsza obliczeniowo.
+  \end{enumerate}
+
+  \section{Użyta metoda}
+  W tym zadaniu zostajemy poproszeni o znalezienie wcześniej podanych współczynników funkcji. Do osiągnięcia tego skorzystamy z \textit{metody najmniejszych kwadratów}.
+
+  \textbf{Metoda najmniejszych kwadratów --} Jest to metoda służąca przybliżaniu rozwiązań układów nieokreślonych, czyli takich w których jest więcej równań niż niewiadomych.
+  
+  Każdy z \textit{n} punktów które posiadamy można potraktować jako jedno równanie. W zapisie macierzowym wygląda to tak:
+
+  \begin{center}
+    $\begin{bmatrix}
+      (x_1)^3 & (x_1)^2 & x_1 & 1 \\
+      (x_2)^3 & (x_2)^2 & x_2 & 1 \\
+      (x_3)^3 & (x_3)^2 & x_3 & 1 \\
+      \vdots & \vdots & \vdots & \vdots \\
+      (x_n)^3 & (x_n)^2 & x_n & 1 \\
+    \end{bmatrix}$
+  $\begin{bmatrix}
+    \textcolor{red}{a} \\
+    \textcolor{blue}{b} \\
+    \textcolor{green}{c} \\ 
+    \textcolor{yellow}{d} \\
+  \end{bmatrix}$
+  $=$
+  $\begin{bmatrix}
+    f(x_1) \\
+    f(x_2)\\
+    f(x_3)\\
+    \vdots \\
+    f(x_n)\\
+  \end{bmatrix}$
+\end{center}
+
+Po rozwiązaniu powyższego układu rownań otrzymujemy rozwiązanie w powstaci szukanych współczynników z których możemy obliczyć przybliżoną funkcję.
+
+  \section{Uzyskany wynik}
+  \begin{enumerate}
+    \item[\bf{a)}] Wynik wykonania komendy \textit{make runA}:
+    \begin{center}
+      \begin{tcolorbox}
+        Wspolczynniki: \\ 
+        a \textbf{=} 0.100934 \\
+        b \textbf{=} 4.02306 \\
+        c \textbf{=} 3.08874 \\
+        d \textbf{=} 5.63284 \\
+      \end{tcolorbox}
+    \end{center}
+
+    \item[\bf{b)}] Wynik wykonania komendy \textit{make runB}:
+    \begin{center}
+      \begin{tcolorbox}
+        Ustalone parametry: \\
+        a \textbf{=} 2.137 \\
+        b \textbf{=} 0.69 \\ 
+        c \textbf{=} 0.5 \\
+        d \textbf{=} 0.42 \\
+        Uzyskane parametry: \\ 
+        a \textbf{=} 2.49791 \\ 
+        b \textbf{=} 0.771317 \\ 
+        c \textbf{=} 0.409573 \\
+        d \textbf{=} 0.517033 \\
+      \end{tcolorbox}
+    \end{center}
+  \end{enumerate}
+
+  Analizując wyniki z  podpunktu b) uruchamiając program kilka razy bedziemy wstanie zauważyć minimalnie różniące się wyniki ze względu na losowość wybieranych punktów.
+
+  Wyniki na wykresie prezentują się następująco:
+    \begin{figure}[!ht]
+      \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{wyniki_a.eps}
+        \caption{Wykres dla podpunktu a)}
+      \end{minipage}
+      \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{wyniki_b.eps}
+        \caption{Wykres dla podpunktu b)}
+      \end{minipage}
+    \end{figure}
+
+    \begin{enumerate}
+      \item[\bf{a)}] Sposób rozwiązywania działa tak jak powinien prowadząc ``pomiędzy'' punktami przybliżony kształt przyjmowany przez szukaną funkcję.
+      \item[\bf{b)}] Dla losowych 100 punktów zakłóconych liczbami pochodzącymi z rozkładu normalnego Gaussa, uzyskujemy podobny wynik. W tym przypadku jesteśmy wstanie zauważyć jak bardzo uzyskane przybliżenie odstaje od wybranej funkcji tzn. zobaczyć wizualnie wartości błędu pomiarowego spowodowanego wygenerowanymi zakłóceniami.
+    \end{enumerate}
+
+
+  \section{Podsumowanie}
+  \textit{Aproksymacja metodą najmniejszych kwadratów} przydaje się najbardziej gdy potrzebujemy przedstawić funkcję której obliczenie jest wymagające analitycznie lub nie znamy jej parametrów. Używanie jej dla aproksymacji punktowej sprowadza się do rozwiązania układu równań nieokreślonych. Pozwala to na znalezienie zadowalającego nas przybliżania co zaowocuje w krótszym czasie wykonania.
+
+  Choć metoda najmniejszych kwadratów jest potężnym narzędziem, ma też swoje ograniczenia. Na przykład, może nie być odpowiednia, gdy mamy do czynienia z danymi, które są źle uwarunkowane lub mają duże błędy pomiarowe. W takich przypadkach mogą być potrzebne inne techniki numeryczne.
+\end{document}
