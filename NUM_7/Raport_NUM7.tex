@@ -1,0 +1,140 @@
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[polish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{subcaption} 
+\usepackage[margin=2cm]{geometry}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{tcolorbox}
+\usepackage{systeme}
+\usepackage{indentfirst}
+\usepackage{dsfont}
+
+\definecolor{red}{RGB}{245, 63, 60}
+\definecolor{blue}{RGB}{59, 69, 245}
+\definecolor{green}{RGB}{59, 245, 117}
+\definecolor{yellow}{RGB}{245, 207, 59}
+
+\title{Raport Zadanie NUM7}
+\date{22.12.2023}
+\author{Tomasz Dziób}
+
+\begin{document}
+  \maketitle
+  \newpage
+  \section{Wstęp techniczny}
+  Poniższy raport dotyczy zadania numerycznego NUM7 z listy 6. Załączone program o nazwie \textit{num7.cpp} został napisany w języku \textit{C++}, oraz korzysta z biblioteki \textit{GNU Plot}. Przed skompilowaniem programu należy zainstalować powyższą bibliotekę.
+
+    \subsection{Jak uruchomić program?}
+    Razem z załączonymi plikami znajdziemy \textit{Makefile} który służy do uruchomienia programów.
+    \begin{itemize}
+      \item \textit{make run} uruchamia program dotyczący podpunktu a wraz ze sprawdzeniem 
+  \end{itemize}
+
+  \section{Nakreślenie problemu}
+  Interpolację stosuje się do znalezienia funkcji przechodzącej przez znany nam zestaw punktów, które nazywamy węzłami. Różne metody interpolacyjne, mniej lub bardziej dokładnie, przybliżają wartość poszukiwanej funkcji.
+
+  \section{Użyta metoda}
+  \subsection{Interpolacja Lagrange'a}
+  Jedną z metod interpolacji, oraz tą którą mieliśmy za zadanie omówić, jest \textit{interpolacja wielomianowa}. Polega ona na przeprowadzeniu przez \textit{n-węzłów} wielomianu o stopniu \textit{n-1}.
+  Do skontruuowania takiego wielomianu możemy użyć \textit{wzoru Lagrange'a}:
+  \begin{center}
+    $L_{n}(x) = \sum\limits_{i=0}^{n}f(x_i)l_i(x) = \sum\limits_{i=0}^{n}f(x_i)\prod\limits_{\substack{j=0 \\ j \neq i}}^{n} \frac{x - x_j}{x_i - x_j}$
+  \end{center}
+
+  Powyższy wzór służy do obliczania wartości w podanym węźle wielomianu. Za jego pomocą można wyliczyć wartość przybliżanej funkcji w dowolnym punkcie, nie zmieniając jego stopnia. Pozwala to na wykreślenie funkcji bez jawnego poznawania współczynników przy danych potęgach x.
+  \begin{table}[h]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|}
+        \hline
+        $i$ & 0 & 1 & 2 & $\cdots$ & n \\
+        \hline
+        $x_i$ & $x_0$ & $x_1$ & $x_2$ & $\cdots$ & $x_n$ \\
+        \hline
+        $f(x_i)$ & $f(x_0)$ & $f(x_1)$ & $f(x_2)$ & $\cdots$ & $f(x_n)$ \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\begin{center}
+  \begin{align*}
+      L_n(x) = & f(x_0) \frac{(x - x_1)(x - x_2)\cdots(x - x_n)}{(x_0 - x_1)(x_0 - x_2)\cdots(x_0 - x_n)} +\\
+      & + f(x_1) \frac{(x - x_0)(x - x_2)\cdots(x - x_n)}{(x_1 - x_0)(x_1 - x_2)(x_1 - x_n)} + \\
+      & + f(x_2) \frac{(x - x_0)(x - x_1)\cdots(x - x_n)}{(x_2 - x_0)(x_2 - x_1)\cdots(x_2 - x_n)} + \\
+      & \hspace{3cm} \cdots \\
+      & + f(x_n) \frac{(x - x_0)(x - x_1)\cdots(x - x_n)}{(x_n - x_0)(x_n - x_1)\cdots(x_n - x_{n-1})}
+  \end{align*}
+\end{center}
+
+  \textit{Interpolacja wielomianowa} pozwala na obliczenie wartości wielomianu w sposób liniowy(zależne od stopnia wielomianu oraz dokładności w jakiej chcemy wykreślić funkcję).
+
+  \subsection{Dystrybucja węzłów}
+  W zadaniu mieliśmy przedstawić powyższy problem dla dystrybucji węzłów:
+  \begin{enumerate}
+    \item[a)] $x_i = -1 + 2\frac{i}{n+1}$ \qquad $i = (0,1, ..., n)$
+    \item[b)] $x_i = cos( -1 + \frac{2i+1}{2(n+1)}\pi)$ \qquad $i = (0,1, ..., n)$
+  \end{enumerate}
+
+  \section{Uzyskany wynik}
+
+  \begin{enumerate}
+    \item[a)] Przybliżana funkcja $y(x) = \frac{1}{1+50x^2}$ \qquad Dystrybucja węzłów: $x_i = -1 + 2\frac{i}{n+1}$ \\
+    \begin{figure}[!ht]
+      \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{wyniki_a_5.eps}
+      \end{minipage}
+      \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{wyniki_a_10.eps}
+      \end{minipage}
+    \end{figure}
+    \begin{figure}[!ht]
+      \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{wyniki_a_15.eps}
+      \end{minipage}
+      \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{wyniki_a_25.eps}
+      \end{minipage}
+    \end{figure}
+
+    \begin{minipage}{\textwidth}
+      Na wykresach powyżej jesteśmy w stanie zauważyć jak zmienia się funkcja w zależności od ilości wybranych węzłów. Dla $n = 10$ obserwujemy już zbliżanie się kształtem do pożądanej funkcji. Niestety obecność \textit{efektu Rungego} udziela się już dla wielomianu 14 rzędu co oznacza błąd interpolacji dobranie nieodpowiedniej metody dla tej funkcji.
+  \end{minipage}
+
+    \item[b)] Przybliżana funkcja $y(x) = \frac{1}{1+50x^2}$ \qquad Dystrybucja węzłów: $x_i = cos( -1 + \frac{2i+1}{2(n+1)}\pi)$
+    \begin{figure}[!ht]
+      \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{wyniki_b_5.eps}
+      \end{minipage}
+      \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{wyniki_b_10.eps}
+      \end{minipage}
+    \end{figure}
+    \begin{figure}[!ht]
+      \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{wyniki_b_15.eps}
+      \end{minipage}
+      \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{wyniki_b_25.eps}
+      \end{minipage}
+    \end{figure}
+  \end{enumerate}
+  \newpage
+  \begin{minipage}{\textwidth}
+    Używanie dystrybucji podanej w podpunkcie b) wykazuje się większą odpornością na błędy. Dla $n = 10$ obserwujemy już zbliżanie się kształtem do pożądanej funkcji. Ilość węzłów 15, 25 przybliża w bardzo dokładny sposób ogólny kształt poszukiwanej funkcji. \textit{Efekt Rungego} nie występuje oraz wraz ze wzrostem rzędu wielomianu jesteśmy wstanie zauważyć polepszenie dokładności.
+\end{minipage}
+
+  \section{Podsumowanie}
+  Skuteczność interpolacji wielomianowej znacząco zależy od funkcji, którą interpolujemy. W sytuacji, gdy zwiększamy liczbę węzłów na końcach przedziału może przyczynić się pojawienia się oscylacji Rungego, co za tym idzie błędu interpolacji. Metoda ta jest szczególnie użyteczna w przypadku funkcji, które przypuszczalnie mają charakter wielomianowy.
+\end{document}
